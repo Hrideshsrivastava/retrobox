@@ -21,12 +21,20 @@ function RoomModel({ onButtonClick, isLocked }) {
   useEffect(() => {
   console.log('Scene graph:');
   scene.traverse((child) => {
-    if (child.isMesh) {
+    if(!child.name.toLowerCase().includes('cabinet1_tex_cupboard_0') &&
+       !child.name.toLowerCase().includes('cube_1')) {
+      if (child.isMesh) {
       console.log('Mesh:', child.name);
       child.userData.interactive = true;
     } else {
       console.log('Other:', child.type, child.name);
     }
+    };
+
+    
+
+
+
   });
 }, [scene]);
 

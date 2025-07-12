@@ -1,58 +1,82 @@
 
-import React, { Suspense, useRef, useState } from 'react';
+import React, { Suspense, useRef, useState,useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { PointerLockControls } from '@react-three/drei';
 import RoomModel from './RoomModel';
 import PlayerMovement from './PlayerMovement';
 import * as THREE from 'three';
+import Remote from './Remote';
 
 function App() {
   const [isLocked, setIsLocked] = useState(false);
   const controlsRef = useRef();
   const sceneRef = useRef();
   const cameraRef = useRef();
+  const [userInstructions, setUserInstructions] = useState(true);
+  const [showRemote, setShowRemote] = useState(false);
+const [tvVideoId, setTvVideoId] = useState(null); // Will hold YouTube video ID
+  
+  
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    setUserInstructions(false);
+  }, 30000);
+  return () => clearTimeout(timer);
+}, []);
 
   const handleButtonClick = (name) => {
-    console.log('Clicked:', name);
-    if (name.toLowerCase().includes('television')) {
+    console.log('Clicked:', name, 'Typeof:', typeof name, 'Lower:', name.toLowerCase());
+
+    if (name.toLowerCase().includes('cube')) {
       console.log("TV clicked");
+      setShowRemote(true); // ⬅️ show remote when TV is clicked
+      
     }
-    if (name.toLowerCase().includes('Cylinder002_1')) {
-      const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+    else if (name.toLowerCase().includes('cylinder')) {
+      console.log("radio clicked");
+      const audio = new Audio("/Recording (44).m4a");
       audio.play();
     }
   };
 
-  const handlePointerDown = (e) => {
-    if (isLocked) return;
+const handlePointerDown = (e) => {
+  if (isLocked) return;
 
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const bounds = e.target.getBoundingClientRect();
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const bounds = e.target.getBoundingClientRect();
 
-    mouse.x = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
-    mouse.y = -((e.clientY - bounds.top) / bounds.height) * 2 + 1;
+  mouse.x = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
+  mouse.y = -((e.clientY - bounds.top) / bounds.height) * 2 + 1;
 
-    if (!cameraRef.current || !sceneRef.current) return;
+  if (!cameraRef.current || !sceneRef.current) return;
 
-    raycaster.setFromCamera(mouse, cameraRef.current);
-    const intersects = raycaster.intersectObjects(sceneRef.current.children, true);
+  raycaster.setFromCamera(mouse, cameraRef.current);
 
-    if (intersects.length > 0) {
-      const obj = intersects[0].object;
-      if (obj.userData.interactive) {
-        handleButtonClick(obj.name);
-        return;
-      }
+  // 🔥 Traverse and collect all interactive meshes
+  const clickableMeshes = [];
+  sceneRef.current.traverse((child) => {
+    if (child.isMesh && child.userData.interactive) {
+      clickableMeshes.push(child);
     }
+  });
 
-    requestAnimationFrame(() => {
-  controlsRef.current?.lock();
-});
+  const intersects = raycaster.intersectObjects(clickableMeshes, true);
+  intersects.sort((a, b) => a.distance - b.distance);
 
-  };
+  if (intersects.length > 0) {
+    const obj = intersects[0].object;
+    handleButtonClick(obj.name);
+    return;
+  }
 
-  return (
+  // If nothing was clicked, enter locked mode
+  requestAnimationFrame(() => {
+    controlsRef.current?.lock();
+  });
+};
+
+return (
     <div
       style={{ width: '100vw', height: '100vh' }}
       onPointerDown={handlePointerDown}
@@ -79,8 +103,7 @@ function App() {
           onUnlock={() => setIsLocked(false)}
         />
       </Canvas>
-
-      <div
+{userInstructions &&      ( <div
         style={{
           position: 'absolute',
           top: 20,
@@ -95,9 +118,39 @@ function App() {
         Double-click elsewhere to enter room<br />
         Use <b>W A S D</b> to move<br />
         Press <b>Esc</b> to unlock and interact
-      </div>
-    </div>
-  );
-}
+      </div>)
+      };
+      {showRemote && (
+  <Remote
+    onSelectChannel={(videoId) => {
+      setTvVideoId(videoId);
+    }}
+    onClose={() => {setShowRemote(false) ; setTvVideoId(null);}}
+  />
+)}
+{tvVideoId && (
+  <iframe
+    width="480"
+    height="270"
+    src={`https://www.youtube.com/embed/${tvVideoId}?autoplay=1`}
+    title="YouTube video"
+    frameBorder="0"
+    allow="autoplay; encrypted-media"
+    allowFullScreen
+    style={{
+      position: 'absolute',
+      top: '30%',
+      left: '30%',
+      transform: 'translate(-50%, -50%)',
+      borderRadius: '12px',
+      zIndex: 1000
+    }}
+  />
+)}
 
+    </div>
+  
+
+
+);}
 export default App;
