@@ -9,10 +9,15 @@ function RoomModel({ onButtonClick, isLocked, tvVideoId, showTV }) {
   useEffect(() => {
     scene.traverse((child) => {
       if (child.isMesh) {
-        const parentName = child.parent?.name?.toLowerCase();
+        if(!child.name.toLowerCase().includes('cube_1')) {
+
+          const parentName = child.parent?.name?.toLowerCase();
         if (parentName === 'television' || parentName === 'radio') {
           child.userData.interactive = true;
         }
+
+        }
+        
       }
     });
   }, [scene]);
