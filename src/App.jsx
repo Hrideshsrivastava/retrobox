@@ -59,7 +59,7 @@ function App() {
     >
       <Canvas
         shadows
-        camera={{ position: [0, 1.7, 0], fov: 75 }}
+        camera={{ position: [0, 2.3, 0], fov: 75 }}
         onCreated={({ scene, camera }) => {
           sceneRef.current = scene;
           cameraRef.current = camera;
