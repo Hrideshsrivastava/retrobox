@@ -1,56 +1,39 @@
 import { useEffect, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
+import IframeTV from './IframeTV';
 
-function RoomModel({ onButtonClick, isLocked }) {
+function RoomModel({ onButtonClick, isLocked, tvVideoId, showTV }) {
   const { scene } = useGLTF('/room3.glb');
   const group = useRef();
 
   useEffect(() => {
-  scene.traverse((child) => {
-    if (child.isMesh) {
-      const parentName = child.parent?.name?.toLowerCase();
-      if (parentName === 'television' || parentName === 'radio') {
-        child.userData.interactive = true;
-        console.log('Interactive:', child.name, '→ Parent:', parentName);
-      }
-    }
-  });
-}, [scene]);
-
-
-  useEffect(() => {
-  console.log('Scene graph:');
-  scene.traverse((child) => {
-    if(!child.name.toLowerCase().includes('cabinet1_tex_cupboard_0') &&
-       !child.name.toLowerCase().includes('cube_1')) {
+    scene.traverse((child) => {
       if (child.isMesh) {
-      console.log('Mesh:', child.name);
-      child.userData.interactive = true;
-    } else {
-      console.log('Other:', child.type, child.name);
-    }
-    };
-
-    
-
-
-
-  });
-}, [scene]);
-
+        const parentName = child.parent?.name?.toLowerCase();
+        if (parentName === 'television' || parentName === 'radio') {
+          child.userData.interactive = true;
+        }
+      }
+    });
+  }, [scene]);
 
   return (
-    <primitive
-      object={scene}
-      ref={group}
-      onClick={(e) => {
-        if (!isLocked && e.object.userData.interactive) {
-          e.stopPropagation();
-          onButtonClick(e.object.name);
-        }
-      }}
-    />
+    <>
+      <primitive
+        object={scene}
+        ref={group}
+        onClick={(e) => {
+          if (!isLocked && e.object.userData.interactive) {
+            e.stopPropagation();
+            onButtonClick(e.object.name);
+          }
+        }}
+      />
+      {/* 🔥 Persistent 3D TV iframe */}
+      <IframeTV videoId={tvVideoId} visible={showTV} />
+    </>
   );
 }
 
 export default RoomModel;
+
