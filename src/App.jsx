@@ -13,6 +13,9 @@ function App() {
   const cameraRef = useRef();
   const [userInstructions, setUserInstructions] = useState(true);
 
+  const [tvMuted, setTvMuted] = useState(false);
+const [tvPlaying, setTvPlaying] = useState(true);
+
   const [showRemote, setShowRemote] = useState(false);
   const [tvVideoId, setTvVideoId] = useState(null); // YouTube video ID
 
@@ -60,10 +63,11 @@ useEffect(() => {
     if (name.toLowerCase().includes('cube')) {
       console.log("TV clicked");
       setShowRemote(true);
-      stopPropagation();
+      
     } else if (name.toLowerCase().includes('cylinder')) {
       console.log("Radio clicked");
       setRadioPlaying(true);
+      
     }
   };
 
@@ -148,12 +152,16 @@ useEffect(() => {
         />
 
         <Suspense fallback={null}>
+          
           <RoomModel
-              onButtonClick={handleButtonClick}
-              isLocked={isLocked}
-              tvVideoId={tvVideoId}
-              showTV={showRemote}
-          />
+  onButtonClick={handleButtonClick}
+  isLocked={isLocked}
+  tvVideoId={tvVideoId}
+  showTV={showRemote}
+  tvMuted={tvMuted}
+  tvPlaying={tvPlaying}
+/>
+
 
         </Suspense>
 
@@ -203,9 +211,15 @@ useEffect(() => {
         if (window.tvPlayer?.current?.stopVideo) {
           window.tvPlayer.current.stopVideo();
         }
+        
         setShowRemote(false);
         setTimeout(() => setTvVideoId(null), 100);
       }}
+      tvMuted={tvMuted}
+  setTvMuted={setTvMuted}
+  tvPlaying={tvPlaying}
+  setTvPlaying={setTvPlaying}
+
     />
   </div>
 )}

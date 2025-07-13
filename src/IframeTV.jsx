@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Html } from '@react-three/drei';
 
-const IframeTV = ({ videoId, visible }) => {
+const IframeTV = ({ videoId, visible, tvMuted, tvPlaying }) => {
   const iframeRef = useRef();
   const playerRef = useRef();
 
@@ -19,7 +19,11 @@ const IframeTV = ({ videoId, visible }) => {
     if (!visible || !videoId || !window.YT || !iframeRef.current) return;
 
     const onPlayerReady = (event) => {
-      event.target.playVideo();
+      if (tvMuted) event.target.mute();
+      else event.target.unMute();
+
+      if (tvPlaying) event.target.playVideo();
+      else event.target.pauseVideo();
     };
 
     playerRef.current = new window.YT.Player(iframeRef.current, {
@@ -29,12 +33,12 @@ const IframeTV = ({ videoId, visible }) => {
       },
       playerVars: {
         autoplay: 1,
-        mute: 1,
+        mute: tvMuted ? 1 : 0,
         enablejsapi: 1,
       },
     });
 
-    window.tvPlayer = playerRef; // global access if needed
+    window.tvPlayer = playerRef; // global access
 
     return () => {
       try {
@@ -44,7 +48,7 @@ const IframeTV = ({ videoId, visible }) => {
         console.warn("Player destroy failed:", err);
       }
     };
-  }, [videoId, visible]);
+  }, [videoId, visible, tvMuted, tvPlaying]);
 
   return (
     <mesh position={[-1.7, 2.4, 0.1]} rotation={[0, 1.6, 0]}>
