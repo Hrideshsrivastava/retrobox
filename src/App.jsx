@@ -138,17 +138,17 @@ useEffect(() => {
         <ambientLight intensity={2} />
         <pointLight
           position={[0, 3, 0]}
-          intensity={10}
+          intensity={5}
           distance={10}
           decay={2}
           color="yellow"
         />
         <pointLight
           position={[5.45, 3.05, -0.15]}
-          intensity={10}
+          intensity={5}
           distance={10}
           decay={2}
-          color="yellow"
+          color="orange"
         />
 
         <Suspense fallback={null}>
