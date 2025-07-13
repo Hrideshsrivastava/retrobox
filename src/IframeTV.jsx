@@ -1,4 +1,3 @@
-// IframeTV.jsx
 import React, { useRef, useEffect } from 'react';
 import { Html } from '@react-three/drei';
 
@@ -6,7 +5,7 @@ const IframeTV = ({ videoId, visible }) => {
   const iframeRef = useRef();
   const playerRef = useRef();
 
-  // Load YouTube Iframe API once
+  // Load YouTube API once
   useEffect(() => {
     if (!window.YT) {
       const tag = document.createElement('script');
@@ -15,7 +14,7 @@ const IframeTV = ({ videoId, visible }) => {
     }
   }, []);
 
-  // Create or destroy player based on visibility
+  // Setup player
   useEffect(() => {
     if (!visible || !videoId || !window.YT || !iframeRef.current) return;
 
@@ -35,20 +34,17 @@ const IframeTV = ({ videoId, visible }) => {
       },
     });
 
+    window.tvPlayer = playerRef; // global access if needed
+
     return () => {
-      playerRef.current?.destroy?.();
+      try {
+        playerRef.current?.destroy?.();
+        playerRef.current = null;
+      } catch (err) {
+        console.warn("Player destroy failed:", err);
+      }
     };
   }, [videoId, visible]);
-
-  // Optional: Stop video if hidden
-  useEffect(() => {
-    if (!visible && playerRef.current) {
-      playerRef.current.stopVideo?.();
-    }
-  }, [visible]);
-
-  // Expose controls via global if needed
-  window.tvPlayer = playerRef;
 
   return (
     <mesh position={[-1.7, 2.4, 0.1]} rotation={[0, 1.6, 0]}>

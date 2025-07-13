@@ -35,7 +35,9 @@ function RoomModel({ onButtonClick, isLocked, tvVideoId, showTV }) {
         }}
       />
       {/* 🔥 Persistent 3D TV iframe */}
-      <IframeTV videoId={tvVideoId} visible={showTV} />
+      {tvVideoId && <IframeTV videoId={tvVideoId} visible={showTV} />}
+
+
     </>
   );
 }

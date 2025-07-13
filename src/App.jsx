@@ -12,9 +12,31 @@ function App() {
   const sceneRef = useRef();
   const cameraRef = useRef();
   const [userInstructions, setUserInstructions] = useState(true);
+
   const [showRemote, setShowRemote] = useState(false);
   const [tvVideoId, setTvVideoId] = useState(null); // YouTube video ID
+
   const [radioPlaying, setRadioPlaying] = useState(false);
+
+useEffect(() => {
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+
+  const suppressSingleClickLock = (e) => {
+    if (e.detail === 1) { // single click
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  // Use capture phase to prevent Drei from locking
+  canvas.addEventListener('click', suppressSingleClickLock, true);
+
+  return () => {
+    canvas.removeEventListener('click', suppressSingleClickLock, true);
+  };
+}, []);
+
 
   // Auto-hide help text after 30s
   useEffect(() => {
@@ -39,6 +61,7 @@ function App() {
 
   // Handle mouse interaction (raycasting)
   const handlePointerDown = (e) => {
+    if (e.target.closest('.ui-overlay')) return;
     if (isLocked) return;
 
     const raycaster = new THREE.Raycaster();
@@ -69,16 +92,23 @@ function App() {
     }
 
     // Lock camera if nothing clicked
-    requestAnimationFrame(() => {
-      controlsRef.current?.lock();
-    });
+    // requestAnimationFrame(() => {
+    //   controlsRef.current?.lock();
+    // });
   };
+  const handleDoubleClick = (e) => {
+  if (!isLocked) {
+    controlsRef.current?.lock();
+  }
+};
+
 
   return (
     <div
-      style={{ width: '100vw', height: '100vh' }}
-      onPointerDown={handlePointerDown}
-    >
+  style={{ width: '100vw', height: '100vh' }}
+  onPointerDown={handlePointerDown}
+  onDoubleClick={handleDoubleClick}
+>
       <Canvas
         shadows
         camera={{ position: [0, 2.3, 0], fov: 75 }}
@@ -144,16 +174,33 @@ function App() {
 
       {/* 🎮 Remote Control */}
       {showRemote && (
-        <Remote
-          onSelectChannel={(videoId) => {
-            setTvVideoId(videoId);
-          }}
-          onClose={() => {
-            setShowRemote(false);
-            setTvVideoId(null);
-          }}
-        />
-      )}
+  <div
+    style={{
+      position: 'absolute',
+      top: '20%',
+      right: '30px',
+      zIndex: 1000,
+      pointerEvents: 'none', // ✅ allow clicks to pass through
+    }}
+  >
+    <div style={{ pointerEvents: 'auto' }}>
+      <Remote
+        onSelectChannel={(videoId) => setTvVideoId(videoId)}
+        onClose={() => {
+          if (window.tvPlayer?.current?.stopVideo) {
+            window.tvPlayer.current.stopVideo();
+          }
+          setShowRemote(false);
+          setTimeout(() => setTvVideoId(null), 100);
+        }}
+      />
+    </div>
+  </div>
+)}
+
+
+
+      { /*radio controler*/ }
       {radioPlaying && (
       <RadioPlayer onStop={() => setRadioPlaying(false)} />
     )}
@@ -162,3 +209,4 @@ function App() {
 }
 
 export default App;
+
