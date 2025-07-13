@@ -21,7 +21,11 @@ function Remote({ onSelectChannel, onClose }) {
     { id: 9, label: 'Channel 6', videoId: 'Bx51eegLTY8' }
     
   ];
- 
+ const clickSound = new Audio('/click.mp3');
+const playClick = () => {
+  clickSound.currentTime = 0;
+  clickSound.play();
+};
 
   const currentPlaylist = liveMode ? liveChannels : videoPlaylist;
 
@@ -120,6 +124,7 @@ function Remote({ onSelectChannel, onClose }) {
       <button
         onClick={(e) => {
           e.stopPropagation();
+           playClick();
           toggleLiveMode();
         }}
         style={{
@@ -141,6 +146,7 @@ function Remote({ onSelectChannel, onClose }) {
           key={channel.id}
           onClick={(e) => {
             e.stopPropagation();
+             playClick();
             handleSelectChannel(channel.videoId);
           }}
           style={{
@@ -160,8 +166,8 @@ function Remote({ onSelectChannel, onClose }) {
 
       {!liveMode && (
         <>
-          <button onClick={(e)=>{prevVideo(),e.stopPropagation();}} style={{ width: '100%', marginBottom: '6px' }}>◀️ Prev</button>
-          <button onClick={(e)=>{nextVideo(),e.stopPropagation();}}style={{ width: '100%', marginBottom: '10px' }}>Next ▶️</button>
+          <button onClick={(e)=>{prevVideo(), playClick(),e.stopPropagation();}} style={{ width: '100%', marginBottom: '6px' }}>◀️ Prev</button>
+          <button onClick={(e)=>{nextVideo(), playClick(),e.stopPropagation();}}style={{ width: '100%', marginBottom: '10px' }}>Next ▶️</button>
         </>
       )}
 
@@ -169,12 +175,14 @@ function Remote({ onSelectChannel, onClose }) {
         <>
           <button onClick={(e) => {
           e.stopPropagation(); // ✅ prevent pointer lock
+           playClick();
           toggleMute();
         }}style={{ width: '100%', marginBottom: '8px' }}>
             {isMuted ? 'Unmute' : 'Mute'}
           </button>
           <button onClick={(e) => {
           e.stopPropagation(); // ✅ prevent pointer lock
+           playClick();
           togglePlayPause();
         }} style={{ width: '100%', marginBottom: '8px' }}>
             {isPlaying ? 'Pause' : 'Play'}

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Html } from '@react-three/drei';
+import './crt.css';
 
 const IframeTV = ({ videoId, visible, tvMuted, tvPlaying }) => {
   const iframeRef = useRef();
@@ -55,6 +56,8 @@ const IframeTV = ({ videoId, visible, tvMuted, tvPlaying }) => {
       <planeGeometry args={[0.65, 0.45]} />
       <meshBasicMaterial transparent opacity={0} />
       <Html transform distanceFactor={1.5} position={[0, 0, 0.01]}>
+         <div className="crt-wrapper" style={{ display: visible ? 'block' : 'none' }}>
+          <div className="crt">
         <div style={{ display: visible ? 'block' : 'none' }}>
           <div
             id="tv-iframe"
@@ -68,6 +71,8 @@ const IframeTV = ({ videoId, visible, tvMuted, tvPlaying }) => {
             }}
           />
         </div>
+          </div>
+          </div>
       </Html>
     </mesh>
   );

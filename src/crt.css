@@ -1,0 +1,144 @@
+/* crt.css */
+.crt-wrapper {
+  position: relative;
+  width: 340px;
+  height: 210px;
+  background: black;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
+}
+
+.crt {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  position: relative;
+}
+
+/* Simulate scanlines */
+.crt::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.1) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Optional: Slight blur + glow */
+.crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.15);
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+  }
+
+  20%, 24%, 55% {
+    opacity: 0.6;
+  }
+
+  22%, 57% {
+    opacity: 0.85;
+  }
+}
+
+.crt-wrapper {
+  position: relative;
+  width: 340px;
+  height: 210px;
+  background: black;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
+  animation: flicker 1.5s infinite;
+}
+
+.crt {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+}
+.crt::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 2;
+  pointer-events: none;
+  animation: flicker 1.2s infinite;
+}
+
+@keyframes strongFlicker {
+  0%   { opacity: 1; filter: brightness(1); }
+  2%   { opacity: 0.6; filter: brightness(1.1); }
+  4%   { opacity: 0.9; filter: brightness(0.9); }
+  6%   { opacity: 0.4; filter: brightness(1.2); }
+  8%   { opacity: 1;   filter: brightness(1); }
+  10%  { opacity: 0.7; filter: brightness(0.95); }
+  12%  { opacity: 0.85; filter: brightness(1.05); }
+  14%  { opacity: 0.3; filter: brightness(1.2); }
+  16%  { opacity: 1;   filter: brightness(1); }
+  100% { opacity: 1;   filter: brightness(1); }
+}
+
+.crt-wrapper {
+  position: relative;
+  width: 340px;
+  height: 210px;
+  background: black;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 40px rgba(0, 255, 0, 0.2);
+  animation: strongFlicker 0.6s infinite;
+}
+
+.crt::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 2;
+  pointer-events: none;
+  animation: strongFlicker 0.6s infinite;
+}
+
+.crt {
+  animation: jitter 0.3s infinite;
+}
+
+@keyframes jitter {
+  0%   { transform: translate(0px, 0px); }
+  25%  { transform: translate(-1px, 0.5px); }
+  50%  { transform: translate(1px, -1px); }
+  75%  { transform: translate(-0.5px, 1px); }
+  100% { transform: translate(0px, 0px); }
+}

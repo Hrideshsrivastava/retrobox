@@ -188,7 +188,6 @@ useEffect(() => {
           }}
         >
           Click on objects to interact<br />
-          Double-click elsewhere to enter room<br />
           Use <b>W A S D</b> to move<br />
           Press <b>Esc</b> to unlock and interact
         </div>

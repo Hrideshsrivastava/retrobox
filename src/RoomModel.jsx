@@ -5,6 +5,7 @@ import IframeTV from './IframeTV';
 function RoomModel({ onButtonClick, isLocked, tvVideoId, showTV, tvMuted, tvPlaying }) {
   const { scene } = useGLTF('/room3.glb');
   const group = useRef();
+   
 
   useEffect(() => {
     scene.traverse((child) => {
@@ -19,9 +20,12 @@ function RoomModel({ onButtonClick, isLocked, tvVideoId, showTV, tvMuted, tvPlay
     });
   }, [scene]);
 
+    
+
   return (
     <>
       <primitive object={scene} ref={group} />
+
       {tvVideoId && (
         <IframeTV
           videoId={tvVideoId}
