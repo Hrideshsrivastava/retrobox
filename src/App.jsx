@@ -17,25 +17,32 @@ function App() {
   const [tvVideoId, setTvVideoId] = useState(null); // YouTube video ID
 
   const [radioPlaying, setRadioPlaying] = useState(false);
-
 useEffect(() => {
   const canvas = document.querySelector('canvas');
   if (!canvas) return;
 
-  const suppressSingleClickLock = (e) => {
-    if (e.detail === 1) { // single click
-      e.preventDefault();
-      e.stopPropagation();
+  const suppressClickToLock = (e) => {
+    let el = e.target;
+    while (el) {
+      if (
+        el.tagName === 'IFRAME' ||
+        el.classList?.contains('remote-ui') ||
+        el.closest('.remote-ui') ||
+        el.classList?.contains('radio-ui') ||
+        el.closest('.radio-ui')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      el = el.parentElement;
     }
   };
 
-  // Use capture phase to prevent Drei from locking
-  canvas.addEventListener('click', suppressSingleClickLock, true);
-
-  return () => {
-    canvas.removeEventListener('click', suppressSingleClickLock, true);
-  };
+  canvas.addEventListener('click', suppressClickToLock, true);
+  return () => canvas.removeEventListener('click', suppressClickToLock, true);
 }, []);
+
 
 
   // Auto-hide help text after 30s
@@ -49,10 +56,11 @@ useEffect(() => {
   // Handle object clicks (TV / Radio)
   const handleButtonClick = (name) => {
     console.log('Clicked:', name);
-
+    
     if (name.toLowerCase().includes('cube')) {
       console.log("TV clicked");
       setShowRemote(true);
+      stopPropagation();
     } else if (name.toLowerCase().includes('cylinder')) {
       console.log("Radio clicked");
       setRadioPlaying(true);
@@ -61,7 +69,13 @@ useEffect(() => {
 
   // Handle mouse interaction (raycasting)
   const handlePointerDown = (e) => {
-    if (e.target.closest('.ui-overlay')) return;
+    let el = e.target;
+  while (el) {
+    if (el.tagName === 'IFRAME' || el.closest('.remote-ui')) {
+      return;
+    }
+    el = el.parentElement;
+  }
     if (isLocked) return;
 
     const raycaster = new THREE.Raycaster();
@@ -175,26 +189,24 @@ useEffect(() => {
       {/* 🎮 Remote Control */}
       {showRemote && (
   <div
+    className="remote-ui" // 👈 this is now used for click filtering
     style={{
       position: 'absolute',
-      top: '20%',
+      top: '10%',
       right: '30px',
       zIndex: 1000,
-      pointerEvents: 'none', // ✅ allow clicks to pass through
     }}
   >
-    <div style={{ pointerEvents: 'auto' }}>
-      <Remote
-        onSelectChannel={(videoId) => setTvVideoId(videoId)}
-        onClose={() => {
-          if (window.tvPlayer?.current?.stopVideo) {
-            window.tvPlayer.current.stopVideo();
-          }
-          setShowRemote(false);
-          setTimeout(() => setTvVideoId(null), 100);
-        }}
-      />
-    </div>
+    <Remote
+      onSelectChannel={(videoId) => setTvVideoId(videoId)}
+      onClose={() => {
+        if (window.tvPlayer?.current?.stopVideo) {
+          window.tvPlayer.current.stopVideo();
+        }
+        setShowRemote(false);
+        setTimeout(() => setTvVideoId(null), 100);
+      }}
+    />
   </div>
 )}
 

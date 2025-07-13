@@ -27,12 +27,7 @@ function RoomModel({ onButtonClick, isLocked, tvVideoId, showTV }) {
       <primitive
         object={scene}
         ref={group}
-        onClick={(e) => {
-          if (!isLocked && e.object.userData.interactive) {
-            e.stopPropagation();
-            onButtonClick(e.object.name);
-          }
-        }}
+       
       />
       {/* 🔥 Persistent 3D TV iframe */}
       {tvVideoId && <IframeTV videoId={tvVideoId} visible={showTV} />}

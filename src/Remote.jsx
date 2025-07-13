@@ -8,8 +8,7 @@ function Remote({ onSelectChannel, onClose }) {
     const player = window.tvPlayer?.current;
     if (player) {
       setIsMuted(player.isMuted());
-      // No reliable API to get play/pause state directly, so we default to "playing"
-      setIsPlaying(true);
+      setIsPlaying(true); // assume it's playing by default
     }
   }, []);
 
@@ -30,7 +29,6 @@ function Remote({ onSelectChannel, onClose }) {
     const player = window.tvPlayer?.current;
     if (!player) return;
 
-    // YouTube iframe API: playVideo() and pauseVideo()
     if (isPlaying) {
       player.pauseVideo();
       setIsPlaying(false);
@@ -63,7 +61,10 @@ function Remote({ onSelectChannel, onClose }) {
       {channels.map(channel => (
         <button
           key={channel.id}
-          onClick={() => onSelectChannel(channel.videoId)}
+          onClick={(e) => {
+            e.stopPropagation(); // ✅ prevent pointer lock
+            onSelectChannel(channel.videoId);
+          }}
           style={{ display: 'block', margin: '8px 0', width: '100%' }}
         >
           {channel.label}
@@ -73,16 +74,36 @@ function Remote({ onSelectChannel, onClose }) {
       <hr />
 
       {/* 🔇 Mute Button */}
-      <button onClick={toggleMute} style={{ marginBottom: '8px', width: '100%' }}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // ✅ prevent pointer lock
+          toggleMute();
+        }}
+        style={{ marginBottom: '8px', width: '100%' }}
+      >
         {isMuted ? 'Unmute' : 'Mute'}
       </button>
 
       {/* ⏯️ Play/Pause Button */}
-      <button onClick={togglePlayPause} style={{ marginBottom: '8px', width: '100%' }}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // ✅ prevent pointer lock
+          togglePlayPause();
+        }}
+        style={{ marginBottom: '8px', width: '100%' }}
+      >
         {isPlaying ? 'Pause' : 'Play'}
       </button>
 
-      <button onClick={onClose} style={{ width: '100%' }}>Close</button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // ✅ prevent pointer lock
+          onClose();
+        }}
+        style={{ width: '100%' }}
+      >
+        Close
+      </button>
     </div>
   );
 }
